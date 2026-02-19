@@ -1,81 +1,73 @@
-# Intercom
+# InterTask — Decentralized P2P Task Board
 
-This repository is a reference implementation of the **Intercom** stack on Trac Network for an **internet of agents**.
+> Built on [Trac Intercom](https://github.com/Trac-Systems/intercom) · Vibe Competition Entry
 
-At its core, Intercom is a **peer-to-peer (P2P) network**: peers discover each other and communicate directly (with optional relaying) over the Trac/Holepunch stack (Hyperswarm/HyperDHT + Protomux). There is no central server required for sidechannel messaging.
+**InterTask** is a fully decentralized, serverless collaborative task manager running on the Trac Network. No backend, no database, no authority — just peers, contracts, and fast sidechannel messaging.
 
-Features:
-- **Sidechannels**: fast, ephemeral P2P messaging (with optional policy: welcome, owner-only write, invites, PoW, relaying).
-- **SC-Bridge**: authenticated local WebSocket control surface for agents/tools (no TTY required).
-- **Contract + protocol**: deterministic replicated state and optional chat (subnet plane).
-- **MSB client**: optional value-settled transactions via the validator network.
+---
 
-Additional references: https://www.moltbook.com/post/9ddd5a47-4e8d-4f01-9908-774669a11c21 and moltbook m/intercom
+## Features
 
-For full, agent‑oriented instructions and operational guidance, **start with `SKILL.md`**.  
-It includes setup steps, required runtime, first‑run decisions, and operational notes.
+- 📋 **Create, assign, complete, and cancel tasks** — all stored in a Trac smart contract
+- ⚡ **Live updates** via the Intercom sidechannel (sub-second latency)
+- 💬 **Built-in sidechannel chat** between peers
+- 🖥️ **Dual mode** — terminal CLI *or* native desktop GUI (App3)
+- 🔐 **Trustless auth** — only creators/assignees can complete tasks; only creators/admins can cancel
+- 🌐 **HTTP API** support for web3 integration
 
-## Awesome Intercom
+---
 
-For a curated list of agentic Intercom apps check out: https://github.com/Trac-Systems/awesome-intercom
+## Quick Start
 
-## What this repo is for
-- A working, pinned example to bootstrap agents and peers onto Trac Network.
-- A template that can be trimmed down for sidechannel‑only usage or extended for full contract‑based apps.
+```bash
+git clone https://github.com/YOUR_USERNAME/intertask.git
+cd intertask
+npm install -g pear
+npm install
+pear run . store1
+```
 
-## How to use
-Use the **Pear runtime only** (never native node).  
-Follow the steps in `SKILL.md` to install dependencies, run the admin peer, and join peers correctly.
+→ Full setup guide in **[SKILL.md](./SKILL.md)**
 
-## Architecture (ASCII map)
-Intercom is a single long-running Pear process that participates in three distinct networking "planes":
-- **Subnet plane**: deterministic state replication (Autobase/Hyperbee over Hyperswarm/Protomux).
-- **Sidechannel plane**: fast ephemeral messaging (Hyperswarm/Protomux) with optional policy gates (welcome, owner-only write, invites).
-- **MSB plane**: optional value-settled transactions (Peer -> MSB client -> validator network).
+---
 
-```text
-                          Pear runtime (mandatory)
-                pear run . --peer-store-name <peer> --msb-store-name <msb>
-                                        |
-                                        v
-  +-------------------------------------------------------------------------+
-  |                            Intercom peer process                         |
-  |                                                                         |
-  |  Local state:                                                          |
-  |  - stores/<peer-store-name>/...   (peer identity, subnet state, etc)    |
-  |  - stores/<msb-store-name>/...    (MSB wallet/client state)             |
-  |                                                                         |
-  |  Networking planes:                                                     |
-  |                                                                         |
-  |  [1] Subnet plane (replication)                                         |
-  |      --subnet-channel <name>                                            |
-  |      --subnet-bootstrap <admin-writer-key-hex>  (joiners only)          |
-  |                                                                         |
-  |  [2] Sidechannel plane (ephemeral messaging)                             |
-  |      entry: 0000intercom   (name-only, open to all)                     |
-  |      extras: --sidechannels chan1,chan2                                 |
-  |      policy (per channel): welcome / owner-only write / invites         |
-  |      relay: optional peers forward plaintext payloads to others          |
-  |                                                                         |
-  |  [3] MSB plane (transactions / settlement)                               |
-  |      Peer -> MsbClient -> MSB validator network                          |
-  |                                                                         |
-  |  Agent control surface (preferred):                                     |
-  |  SC-Bridge (WebSocket, auth required)                                   |
-  |    JSON: auth, send, join, open, stats, info, ...                       |
-  +------------------------------+------------------------------+-----------+
-                                 |                              |
-                                 | SC-Bridge (ws://host:port)   | P2P (Hyperswarm)
-                                 v                              v
-                       +-----------------+            +-----------------------+
-                       | Agent / tooling |            | Other peers (P2P)     |
-                       | (no TTY needed) |<---------->| subnet + sidechannels |
-                       +-----------------+            +-----------------------+
+## Desktop GUI
 
-  Optional for local testing:
-  - --dht-bootstrap "<host:port,host:port>" overrides the peer's HyperDHT bootstraps
-    (all peers that should discover each other must use the same list).
+Switch to GUI mode by editing `package.json`:
+```json
+"main": "index.html",
+"pear": { "type": "desktop" }
+```
+Then: `pear run -d . store1`
+
+---
+
+## Screenshots
+
+> *See `/screenshots/` for proof-of-function screenshots.*
+
+---
+
+## Trac Address
+
+```
+trac1rjlv33e75cfv3mq35y53txgprnkme7dxaqufjt6ehg7xt6e7hz4sknuc0t
 ```
 
 ---
-If you plan to build your own app, study the existing contract/protocol and remove example logic as needed (see `SKILL.md`).
+
+## Stack
+
+| Layer | Technology |
+|---|---|
+| Runtime | Pear / Holepunch |
+| P2P Network | Trac Network |
+| Sidechannel | Trac Intercom |
+| State | Trac Smart Contract |
+| Language | JavaScript (ESM) |
+
+---
+
+## License
+
+MIT — fork it, ship it, earn TNK. 🚀
